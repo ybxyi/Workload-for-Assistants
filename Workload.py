@@ -9,7 +9,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 # === Google Sheets setup ===
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 CREDS = ServiceAccountCredentials.from_json_keyfile_name(
-    r"C:\Users\ybvai\OneDrive\Рабочий стол\Workload for Assistants\workload-for-assistants-1a386c7afcc6.json",
+    "/home/ubuntu/newhire-bot/workload-for-assistants-1a386c7afcc6.json",
     SCOPE
 )
 GSHEET = gspread.authorize(CREDS)
@@ -137,3 +137,4 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_m
 
 print("Бот запущен...")
 app.run_polling()
+
