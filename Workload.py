@@ -147,8 +147,17 @@ async def process_recent_messages(app):
 # запуск после app.run_polling() нельзя, поэтому добавим через job:
 app.job_queue.run_once(lambda ctx: process_recent_messages(app), 0)
 
-print("Бот запущен...")
-app.run_polling()
+import asyncio
+
+async def main():
+    print("Бот запущен...")
+    # сначала обработка старых сообщений
+    await process_recent_messages(app)
+    # затем запуск бота на новые сообщения
+    await app.run_polling()
+
+asyncio.run(main())
+
 
 
 
