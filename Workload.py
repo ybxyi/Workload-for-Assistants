@@ -113,7 +113,7 @@ async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_T
         return  # пользователь не в списке → игнорируем
 
     # Извлекаем имя водителя — всё между #newhire и 'consent signed'
-    match = re.search(r"#newhire\s+([A-Za-z\s]+)\s+consent\s+signed", text, re.IGNORECASE)
+    match = re.search(r"#newhire\s+(.+?)\s*[-–]?\s*consent\s+signed", text, re.IGNORECASE)
     if not match:
         await message.reply_text("⚠️ Please use format: #newhire Firstname Lastname Consent signed")
         return
@@ -137,6 +137,7 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_m
 
 print("Бот запущен...")
 app.run_polling()
+
 
 
 
