@@ -135,25 +135,10 @@ app = ApplicationBuilder().token("8197361714:AAGRStEOg93duxnxH_id0597kEcEeC1x_AQ
 app.add_handler(MessageHandler(filters.UpdateType.EDITED_MESSAGE, handle_newhire_message))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_message))
 
-async def process_recent_messages(app):
-    chat_ids = list(CHAT_COMPANY_MAP.keys())
-    for chat_id in chat_ids:
-        try:
-            async for msg in app.bot.get_chat_history(chat_id, limit=50):  # последние 50 сообщений
-                await handle_newhire_message(msg, app)
-        except Exception as e:
-            print(f"Error fetching history for {chat_id}: {e}")
-
-import asyncio
-
-async def main():
+if __name__ == "__main__":
     print("Бот запущен...")
-    # сначала обработка старых сообщений
-    await process_recent_messages(app)
-    # затем запуск бота на новые сообщения
-    await app.run_polling()
+    app.run_polling()
 
-asyncio.run(main())
 
 
 
