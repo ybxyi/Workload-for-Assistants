@@ -135,33 +135,10 @@ app = ApplicationBuilder().token("8197361714:AAGRStEOg93duxnxH_id0597kEcEeC1x_AQ
 app.add_handler(MessageHandler(filters.UpdateType.EDITED_MESSAGE, handle_newhire_message))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_message))
 
-import asyncio
-
-async def process_recent_messages(app):
-    """Обрабатывает последние 50 сообщений из всех чатов."""
-    for chat_id in CHAT_COMPANY_MAP.keys():
-        try:
-            async for msg in app.bot.get_chat_history(chat_id, limit=50):
-                await handle_newhire_message(Update(update_id=0, message=msg), None)
-        except Exception as e:
-            print(f"⚠️ Error fetching history for chat {chat_id}: {e}")
-
-async def main():
-    print("Бот запущен...")
-    await process_recent_messages(app)  # Проверяем последние сообщения
-    await app.run_polling()             # Запускаем бота
-    await asyncio.Event().wait()        # Не даём завершиться
-
 if __name__ == "__main__":
     print("Бот запущен...")
+    app.run_polling()
 
-    import asyncio
-    asyncio.get_event_loop().run_until_complete(process_recent_messages(app))
-
-    try:
-        app.run_polling()
-    except (KeyboardInterrupt, SystemExit):
-        print("Бот остановлен вручную.")
 
 
 
