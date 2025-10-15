@@ -81,9 +81,22 @@ CHAT_COMPANY_MAP = {
     -4799504965: "Transglobe",
 }
 
-# === Логирование ===
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Настройка логирования в файл + консоль
+logger = logging.getLogger("newhire_bot")
+logger.setLevel(logging.INFO)
+
+# Логирование в файл
+file_handler = logging.FileHandler("bot.log", encoding="utf-8")
+file_handler.setLevel(logging.INFO)
+file_formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
+
+# Логирование в консоль
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(file_formatter)
+logger.addHandler(console_handler)
 
 # === Обработка сообщений ===
 async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -123,6 +136,7 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_m
 if __name__ == "__main__":
     print("Бот запущен...")
     app.run_polling()
+
 
 
 
