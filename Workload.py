@@ -15,6 +15,13 @@ CREDS = ServiceAccountCredentials.from_json_keyfile_name(
 GSHEET = gspread.authorize(CREDS)
 SPREADSHEET = GSHEET.open("Workload for Assistants")
 
+# ===== User ID → Worksheet =====
+USER_WORKSHEET_MAP = {
+    -7466706259: "Joana",
+    -8024856816: "Vanessa",
+    -6621571568: "Lyra"
+}
+
 # Chat ID → Название компании
 CHAT_COMPANY_MAP = {
     -641179811: "Bonu | BLS",
@@ -121,7 +128,7 @@ async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_T
     company_name = CHAT_COMPANY_MAP.get(chat_id, "Unknown")
 
     try:
-        worksheet = SPREADSHEET.worksheet("Joana")
+        worksheet = SPREADSHEET.worksheet(worksheet_name)
         worksheet.append_row([driver_name, now, company_name])
         logger.info(f"Added: {driver_name} | {company_name}")
         await message.reply_text(f"✅ Added to spreadsheet: {driver_name} | {company_name}")
@@ -137,6 +144,7 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_m
 if __name__ == "__main__":
     print("Бот запущен...")
     app.run_polling()
+
 
 
 
