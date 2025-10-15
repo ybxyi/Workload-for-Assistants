@@ -125,6 +125,7 @@ async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_T
         worksheet.append_row([driver_name, now, company_name])
         logger.info(f"Added: {driver_name} | {company_name}")
         await message.reply_text(f"✅ Added to spreadsheet: {driver_name} | {company_name}")
+        logger.warning(f"Cannot reply to message: {e}")
     except Exception as e:
         logger.error(f"Error writing to sheet: {e}")
         await message.reply_text(f"⚠️ Failed to add {driver_name} to spreadsheet.")
@@ -136,6 +137,7 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_m
 if __name__ == "__main__":
     print("Бот запущен...")
     app.run_polling()
+
 
 
 
