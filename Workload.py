@@ -144,9 +144,6 @@ async def process_recent_messages(app):
         except Exception as e:
             print(f"Error fetching history for {chat_id}: {e}")
 
-# запуск после app.run_polling() нельзя, поэтому добавим через job:
-app.job_queue.run_once(lambda ctx: process_recent_messages(app), 0)
-
 import asyncio
 
 async def main():
@@ -157,6 +154,7 @@ async def main():
     await app.run_polling()
 
 asyncio.run(main())
+
 
 
 
