@@ -153,10 +153,16 @@ async def main():
     await asyncio.Event().wait()        # Не даём завершиться
 
 if __name__ == "__main__":
+    print("Бот запущен...")
+
+    import asyncio
+    asyncio.get_event_loop().run_until_complete(process_recent_messages(app))
+
     try:
-        asyncio.run(main())
+        app.run_polling()
     except (KeyboardInterrupt, SystemExit):
         print("Бот остановлен вручную.")
+
 
 
 
