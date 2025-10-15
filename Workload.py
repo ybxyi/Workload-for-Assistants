@@ -88,24 +88,16 @@ logger = logging.getLogger(__name__)
 # === Обработка сообщений ===
 async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.edited_message or update.message
-    if not message:
+    if not message or not message.text:
         return
 
-    user_id = message.from_user.id
     chat_id = message.chat.id
-    text = message.text or ""
-    logger.info(f"Message from user {user_id} in chat {chat_id}: {text}")
+    text = message.text
+    logger.info(f"Message in chat {chat_id}: {text}")
 
-    # Проверяем наличие тега #newhire
     if "#newhire" not in text.lower():
         return
 
-    # Получаем лист по автору сообщения
-    worksheet_name = USER_WORKSHEET_MAP.get(user_id)
-    if not worksheet_name:
-        return  # пользователь не в списке → игнорируем
-
-    # Извлекаем имя водителя — всё между #newhire и 'consent signed'
     match = re.search(r"#newhire\s+(.+?)\s*[-–]?\s*consent\s+signed", text, re.IGNORECASE)
     if not match:
         await message.reply_text("⚠️ Please use format: #newhire Firstname Lastname Consent signed")
@@ -113,16 +105,16 @@ async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_T
 
     driver_name = match.group(1).strip().title()
     now = datetime.now().strftime("%m/%d/%Y")
-
-    # Получаем компанию по chat_id
     company_name = CHAT_COMPANY_MAP.get(chat_id, "Unknown")
 
-    worksheet = SPREADSHEET.worksheet("Joana")
-    worksheet.append_row([driver_name, now, company_name])
-
-    logger.info(f"Added to {worksheet_name}: {driver_name} | {company_name}")
-    await message.reply_text(f"✅ Added to spreadsheet: {driver_name} | {company_name}")
-
+    try:
+        worksheet = SPREADSHEET.worksheet("Joana")
+        worksheet.append_row([driver_name, now, company_name])
+        logger.info(f"Added: {driver_name} | {company_name}")
+        await message.reply_text(f"✅ Added to spreadsheet: {driver_name} | {company_name}")
+    except Exception as e:
+        logger.error(f"Error writing to sheet: {e}")
+        await message.reply_text(f"⚠️ Failed to add {driver_name} to spreadsheet.")
 # === Запуск бота ===
 app = ApplicationBuilder().token("8197361714:AAGRStEOg93duxnxH_id0597kEcEeC1x_AQ").build()
 app.add_handler(MessageHandler(filters.UpdateType.EDITED_MESSAGE, handle_newhire_message))
@@ -131,6 +123,7 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_m
 if __name__ == "__main__":
     print("Бот запущен...")
     app.run_polling()
+
 
 
 
