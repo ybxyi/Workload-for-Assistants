@@ -88,62 +88,77 @@ CHAT_COMPANY_MAP = {
     -4799504965: "Transglobe",
 }
 
-# Настройка логирования в файл + консоль
-logger = logging.getLogger("newhire_bot")
-logger.setLevel(logging.INFO)
+# === Логирование ===
+LOG_DIR = "/home/ubuntu/newhire-bot/logs"
+os.makedirs(LOG_DIR, exist_ok=True)
 
-# Логирование в файл
-file_handler = logging.FileHandler("bot.log", encoding="utf-8")
-file_handler.setLevel(logging.INFO)
-file_formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
-file_handler.setFormatter(file_formatter)
-logger.addHandler(file_handler)
+log_file = os.path.join(LOG_DIR, "newhire.log")
 
-# Логирование в консоль
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-console_handler.setFormatter(file_formatter)
-logger.addHandler(console_handler)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
+    handlers=[
+        logging.FileHandler(log_file, encoding="utf-8"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # === Обработка сообщений ===
 async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.edited_message or update.message
-    if not message or not message.text:
+    if not message:
+        return
+
+    text = (message.text or message.caption or "").strip()
+    if not text:
         return
 
     chat_id = message.chat.id
-    text = message.text
-    logger.info(f"Message in chat {chat_id}: {text}")
+    chat_title = message.chat.title or "Private Chat"
+    user_id = message.from_user.id
+    user_name = message.from_user.full_name
 
+    # логирование любого сообщения
+    logger.info(f"📩 Chat: {chat_title} ({chat_id}) | From: {user_name} ({user_id}) | Text: {text}")
+
+    # если чат не в списке — логируем отдельно
+    if chat_id not in CHAT_COMPANY_MAP:
+        logger.warning(f"⚠️ Новый чат! Неизвестный chat_id: {chat_id} | Title: {chat_title}")
+
+    # ищем тег #newhire
     if "#newhire" not in text.lower():
         return
 
+    # Определяем имя листа для ассистента
+    worksheet_name = USER_WORKSHEET_MAP.get(user_id)
+    if not worksheet_name:
+        logger.warning(f"⚠️ User_id {user_id} не найден в USER_WORKSHEET_MAP.")
+        return
+
+    # Парсим имя водителя
     match = re.search(r"#newhire\s+(.+?)\s*[-–]?\s*consent\s+signed", text, re.IGNORECASE)
     if not match:
-        await message.reply_text("⚠️ Please use format: #newhire Firstname Lastname Consent signed")
+        await message.reply_text("⚠️ Please use format: #newhire Firstname Lastname consent signed")
         return
 
     driver_name = match.group(1).strip().title()
     now = datetime.now().strftime("%m/%d/%Y")
-    company_name = CHAT_COMPANY_MAP.get(chat_id, "Unknown")
+    company_name = CHAT_COMPANY_MAP.get(chat_id, chat_title or "Unknown")
 
-    try:
-        worksheet = SPREADSHEET.worksheet(worksheet_name)
-        worksheet.append_row([driver_name, now, company_name])
-        logger.info(f"Added: {driver_name} | {company_name}")
-        await message.reply_text(f"✅ Added to spreadsheet: {driver_name} | {company_name}")
-        logger.warning(f"Cannot reply to message: {e}")
-    except Exception as e:
-        logger.error(f"Error writing to sheet: {e}")
-        await message.reply_text(f"⚠️ Failed to add {driver_name} to spreadsheet.")
+    worksheet = SPREADSHEET.worksheet(worksheet_name)
+    worksheet.append_row([driver_name, now, company_name])
+
+    await message.reply_text(f"✅ Added {driver_name} ({company_name}) to {worksheet_name} list.")
+    logger.info(f"✅ Added {driver_name} ({company_name}) to {worksheet_name}")
+
 # === Запуск бота ===
 app = ApplicationBuilder().token("8197361714:AAGRStEOg93duxnxH_id0597kEcEeC1x_AQ").build()
-app.add_handler(MessageHandler(filters.UpdateType.EDITED_MESSAGE, handle_newhire_message))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_newhire_message))
+app.add_handler(MessageHandler(filters.ALL, handle_newhire_message))
 
-if __name__ == "__main__":
-    print("Бот запущен...")
-    app.run_polling()
+print("🤖 Бот запущен и логирует все сообщения...")
+app.run_polling()
+
 
 
 
