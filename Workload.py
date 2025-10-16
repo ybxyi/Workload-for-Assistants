@@ -5,6 +5,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import os
 
 # === Google Sheets setup ===
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -156,6 +157,7 @@ app.add_handler(MessageHandler(filters.ALL, handle_newhire_message))
 
 print("🤖 Бот запущен и логирует все сообщения...")
 app.run_polling()
+
 
 
 
