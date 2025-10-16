@@ -18,9 +18,9 @@ SPREADSHEET = GSHEET.open("Workload for Assistants")
 
 # ===== User ID → Worksheet =====
 USER_WORKSHEET_MAP = {
-    -7466706259: "Joana",
-    -8024856816: "Vanessa",
-    -6621571568: "Lyra"
+    7466706259: "Joana",
+    8024856816: "Vanessa",
+    6621571568: "Lyra"
 }
 
 # Chat ID → Название компании
@@ -157,6 +157,7 @@ app.add_handler(MessageHandler(filters.ALL, handle_newhire_message))
 
 print("🤖 Бот запущен и логирует все сообщения...")
 app.run_polling()
+
 
 
 
