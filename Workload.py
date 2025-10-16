@@ -130,17 +130,15 @@ async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_T
     if "#newhire" not in text.lower():
         return
 
-    # Определяем имя листа для ассистента
+    user_id = message.from_user.id
     worksheet_name = USER_WORKSHEET_MAP.get(user_id)
     if not worksheet_name:
-        logger.warning(f"⚠️ User_id {user_id} не найден в USER_WORKSHEET_MAP.")
+        logger.warning(f"User_id {user_id} не найден в USER_WORKSHEET_MAP.")
         return
 
-    # Парсим имя водителя
     match = re.search(r"#newhire\s+(.+?)\s*[-–]?\s*consent\s+signed", text, re.IGNORECASE)
     if not match:
-        await message.reply_text("⚠️ Please use format: #newhire Firstname Lastname consent signed")
-        return
+        return  # просто игнорируем, не надо отвечать
 
     driver_name = match.group(1).strip().title()
     now = datetime.now().strftime("%m/%d/%Y")
@@ -149,8 +147,8 @@ async def handle_newhire_message(update: Update, context: ContextTypes.DEFAULT_T
     worksheet = SPREADSHEET.worksheet(worksheet_name)
     worksheet.append_row([driver_name, now, company_name])
 
-    await message.reply_text(f"✅ Added {driver_name} ({company_name}) to {worksheet_name} list.")
-    logger.info(f"✅ Added {driver_name} ({company_name}) to {worksheet_name}")
+    # ✅ Никаких сообщений в чат не отправляем
+    logger.info(f"Added {driver_name} ({company_name}) to {worksheet_name}")
 
 # === Запуск бота ===
 app = ApplicationBuilder().token("8197361714:AAGRStEOg93duxnxH_id0597kEcEeC1x_AQ").build()
@@ -158,6 +156,7 @@ app.add_handler(MessageHandler(filters.ALL, handle_newhire_message))
 
 print("🤖 Бот запущен и логирует все сообщения...")
 app.run_polling()
+
 
 
 
