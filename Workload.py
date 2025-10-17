@@ -31,7 +31,7 @@ CHAT_COMPANY_MAP = {
     -4845163185: "Father and Sons",
     -4118861668: "Lymar | Bermet",
     -959389426: "DR Trans",
-    -2680483606: "Truck Cap",
+    -1002680483606: "Truck Cap",
     -4718126142: "Bog Transport",
     -4922448088: "Along Roads",
     -4769712410: "UCL",
@@ -48,7 +48,7 @@ CHAT_COMPANY_MAP = {
     -4276079213: "AK Diksi",
     -4648676040: "Speedel",
     -4748315732: "NS Cargo",
-    -2566823527: "BEK",
+    -1002566823527: "BEK",
     -4618741642: "GEM",
     -4594341933: "Kaddat",
     -4768048466: "BOB",
@@ -157,6 +157,7 @@ app.add_handler(MessageHandler(filters.ALL, handle_newhire_message))
 
 print("🤖 Бот запущен и логирует все сообщения...")
 app.run_polling()
+
 
 
 
