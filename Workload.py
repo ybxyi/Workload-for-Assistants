@@ -88,6 +88,7 @@ CHAT_COMPANY_MAP = {
     -4277592397: "US Carrier",
     -4799504965: "Transglobe",
     -711432353: "Novas", 
+    -1002124958013: "Loadpal",
 }
 
 # === Логирование ===
@@ -158,6 +159,7 @@ app.add_handler(MessageHandler(filters.ALL, handle_newhire_message))
 
 print("🤖 Бот запущен и логирует все сообщения...")
 app.run_polling()
+
 
 
 
